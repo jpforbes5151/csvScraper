@@ -1,6 +1,7 @@
 import csv
 import os
 from datetime import datetime
+import pandas as pd
 
 def parse_casts(file_path):
     with open(file_path, 'r') as file:
@@ -54,18 +55,25 @@ def create_matrix(casts):
         metadata = cast['metadata']
         variables = cast['variables']
         for var in variables:
-            row = [
-                metadata.get('Latitude', ''),
-                metadata.get('Longitude', ''),
-                metadata.get('Year', ''),
-                metadata.get('Month', ''),
-                metadata.get('Day', ''),
-                var[0],  # Depth
-                var[1],  # Temperature
-                var[2]   # Salinity
-                # Add more elements here if necessary
-            ]
-            matrix.append(row)
+            depth = var[0]
+            temperature = var[1]
+            salinity = var[2]
+
+            # Check if any of the variables are null or NaN
+            if depth != '' and temperature != '' and salinity != '' and \
+               not pd.isnull(depth) and not pd.isnull(temperature) and not pd.isnull(salinity):
+                row = [
+                    metadata.get('Latitude', ''),
+                    metadata.get('Longitude', ''),
+                    metadata.get('Year', ''),
+                    metadata.get('Month', ''),
+                    metadata.get('Day', ''),
+                    depth,        # Depth
+                    temperature,  # Temperature
+                    salinity      # Salinity
+                    # Add more elements here if necessary
+                ]
+                matrix.append(row)
 
     return matrix
 
@@ -85,13 +93,14 @@ def write_to_csv(matrix, output_file):
         writer.writerows(matrix)
 
     print(f'Data parsed and written to {output_file}')
-# Example usage:
-input_file = './content/ocldb1571108899.16715.CTD2.csv'
+
+
+# Example usage
+input_file = './content/1-1-1.csv'
 output_file = './content/parsed/parsed_data.csv'
 
 casts = parse_casts(input_file)
 matrix = create_matrix(casts)
 write_to_csv(matrix, output_file)
 
-print(f'Data parsed and written to {output_file}')
 
