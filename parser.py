@@ -96,7 +96,7 @@ def write_to_csv(matrix, output_file):
 
 
 # Example usage
-input_file = './content/1-1-1.csv'
+input_file = './content/ocldb1571108899.16715.CTD2.csv'
 output_file = './content/parsed/parsed_data.csv'
 
 casts = parse_casts(input_file)
