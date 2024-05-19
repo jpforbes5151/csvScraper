@@ -23,15 +23,19 @@ def plot_temperature_cubes(matrix):
     # Function to draw cube at each data point
     def draw_cube(x, y, z, size, color, ax):
     # Define vertices of the cube
+        # scale is in the denominator so larger value = smaller face
+        scale_x= 5
+        scale_y= 5
+        scale_z= 0.30
         vertices = np.array([
-            [x - size/2, y - size/2, z - size*5],  # Adjust depth here
-            [x + size/2, y - size/2, z - size*5],
-            [x + size/2, y + size/2, z - size*5],
-            [x - size/2, y + size/2, z - size*5],
-            [x - size/2, y - size/2, z + size*5],
-            [x + size/2, y - size/2, z + size*5],
-            [x + size/2, y + size/2, z + size*5],
-            [x - size/2, y + size/2, z + size*5]
+            [x - size/scale_x, y - size/scale_y, z - size/scale_z],  # Adjust depth here, seems jank but we'll see how it scales.
+            [x + size/scale_x, y - size/scale_y, z - size/scale_z],
+            [x + size/scale_x, y + size/scale_y, z - size/scale_z],
+            [x - size/scale_x, y + size/scale_y, z - size/scale_z],
+            [x - size/scale_x, y - size/scale_y, z + size/scale_z],
+            [x + size/scale_x, y - size/scale_y, z + size/scale_z],
+            [x + size/scale_x, y + size/scale_y, z + size/scale_z],
+            [x - size/scale_x, y + size/scale_y, z + size/scale_z]
         ])
 
         # Define faces of the cube
@@ -92,7 +96,6 @@ def plot_temperature_cubes(matrix):
     fig.colorbar(sm, ax=ax, label='Temperature (°C)')
 
     plt.show()
-
 
 # testing 3d graphs with parsed CSV data
 parsed_file_path = './content/parsed/parsed_data.csv'

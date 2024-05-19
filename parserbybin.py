@@ -2,6 +2,7 @@ import csv
 import os
 from datetime import datetime
 import pandas as pd
+import numpy as np
 
 def parse_casts(file_path):
     with open(file_path, 'r') as file:
@@ -70,7 +71,7 @@ def create_matrix(casts):
                 if temperature == '---0---':
                     temperature = '0'
 
-                #remove weird formatting where there is no trailing decimal
+                # remove weird formatting where there is no trailing decimal
                 if depth.endswith('.'):
                     depth += '0'
                 if temperature.endswith('.'):
@@ -84,16 +85,27 @@ def create_matrix(casts):
                     metadata.get('Year', ''),
                     metadata.get('Month', ''),
                     metadata.get('Day', ''),
-                    depth,        # Depth
-                    temperature,  # Temperature
-                    salinity      # Salinity
+                    float(depth),        # Depth
+                    float(temperature),  # Temperature
+                    float(salinity)      # Salinity
                     # Add more elements here if necessary
                 ]
                 matrix.append(row)
 
     return matrix
 
-def write_to_csv(matrix, output_file):
+def bin_and_average(matrix):
+    df = pd.DataFrame(matrix, columns=['Latitude', 'Longitude', 'Year', 'Month', 'Day', 'Depth', 'Temperature', 'Salinity'])
+    df['Depth_bin'] = (df['Depth'] // 10) * 10
+
+    grouped = df.groupby(['Latitude', 'Longitude', 'Year', 'Month', 'Day', 'Depth_bin']).agg({
+        'Temperature': 'mean',
+        'Salinity': 'mean'
+    }).reset_index()
+
+    return grouped
+
+def write_to_csv(df, output_file):
     # Check if the file already exists
     if os.path.exists(output_file):
         # Append timestamp to the filename
@@ -101,22 +113,17 @@ def write_to_csv(matrix, output_file):
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         output_file = f"{base}_{timestamp}{ext}"
 
-    header = ['Latitude', 'Longitude', 'Year', 'Month', 'Day', 'Depth', 'Temperature', 'Salinity']
+    header = ['Latitude', 'Longitude', 'Year', 'Month', 'Day', 'Depth_bin', 'Temperature', 'Salinity']
 
-    with open(output_file, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(header)
-        writer.writerows(matrix)
-
+    df.to_csv(output_file, index=False, columns=header)
     print(f'Data parsed and written to {output_file}')
 
 
 # Example usage
-input_file = './content/ocldb1571108899.16715.CTD2.csv'
+input_file = './content/ocldb1571108899.16715.CTD5.csv'
 output_file = './content/parsed/parsed_data.csv'
 
 casts = parse_casts(input_file)
 matrix = create_matrix(casts)
-write_to_csv(matrix, output_file)
-
-
+averaged_df = bin_and_average(matrix)
+write_to_csv(averaged_df, output_file)
