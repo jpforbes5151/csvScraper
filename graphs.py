@@ -150,7 +150,7 @@ plot_depth_vs_temperature(test_matrix)
 
 #testing 2d graphs with parsed CSV data
 '''
-parsed_file_path = './content/parsed/parsed_data.csv'
+parsed_file_path = './content/parsed/parsed_data_8.csv'
 df_from_csv = pd.read_csv(parsed_file_path, header=None, skiprows=1)  # Read CSV and remove first row (column titles)
 matrix_from_csv = df_from_csv.values.tolist()
 plot_depth_vs_temperature(matrix_from_csv)
@@ -158,6 +158,7 @@ plot_depth_vs_salinity(matrix_from_csv)
 '''
 
 # testing 3d graphs with parsed CSV data
+
 parsed_file_path = './content/parsed/parsed_data.csv'
 df_from_csv = pd.read_csv(parsed_file_path, header=None, skiprows=1)  # Read CSV and remove first row (column titles)
 matrix_from_csv = df_from_csv.values.tolist()
